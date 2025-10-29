@@ -1,13 +1,32 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { CalendarHeader } from "@/components/CalendarHeader";
 import { CalendarGrid } from "@/components/CalendarGrid";
 import { QuickNavigation } from "@/components/QuickNavigation";
 import { SelectedDateInfo } from "@/components/SelectedDateInfo";
+import { EventForm } from "@/components/EventForm";
+import { Event } from "@/types/event";
 import { xhosaTerms } from "@/utils/xhosaTranslations";
+import { toast } from "@/hooks/use-toast";
 
 const Index = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
+  const [events, setEvents] = useState<Event[]>([]);
+
+  useEffect(() => {
+    const stored = localStorage.getItem("xhosa-calendar-events");
+    if (stored) {
+      try {
+        setEvents(JSON.parse(stored));
+      } catch (e) {
+        console.error("Failed to load events", e);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("xhosa-calendar-events", JSON.stringify(events));
+  }, [events]);
 
   const handlePreviousMonth = () => {
     setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1));
@@ -37,6 +56,26 @@ const Index = () => {
     setSelectedDate(tomorrow);
   };
 
+  const handleAddEvent = (eventData: Omit<Event, "id">) => {
+    const newEvent: Event = {
+      ...eventData,
+      id: `${Date.now()}-${Math.random()}`,
+    };
+    setEvents([...events, newEvent]);
+    toast({
+      title: "Isicwangciso songezelelwe (Event added)",
+      description: eventData.title,
+    });
+  };
+
+  const handleDeleteEvent = (id: string) => {
+    setEvents(events.filter(e => e.id !== id));
+    toast({
+      title: "Isicwangciso sicinyiwe (Event deleted)",
+      variant: "destructive",
+    });
+  };
+
   return (
     <div className="min-h-screen bg-gradient-earth">
       <div className="container max-w-5xl mx-auto px-4 py-8">
@@ -60,6 +99,7 @@ const Index = () => {
             currentDate={currentDate}
             selectedDate={selectedDate}
             onDateSelect={setSelectedDate}
+            events={events}
           />
 
           <QuickNavigation
@@ -68,7 +108,13 @@ const Index = () => {
             onTomorrow={handleTomorrow}
           />
 
-          <SelectedDateInfo date={selectedDate} />
+          <EventForm selectedDate={selectedDate} onAddEvent={handleAddEvent} />
+
+          <SelectedDateInfo 
+            date={selectedDate} 
+            events={events}
+            onDeleteEvent={handleDeleteEvent}
+          />
         </main>
 
         <footer className="text-center mt-8 text-sm text-muted-foreground">

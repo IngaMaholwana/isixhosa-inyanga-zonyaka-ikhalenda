@@ -1,13 +1,15 @@
 import { getDayName } from "@/utils/xhosaTranslations";
 import { cn } from "@/lib/utils";
+import { Event } from "@/types/event";
 
 interface CalendarGridProps {
   currentDate: Date;
   selectedDate: Date | null;
   onDateSelect: (date: Date) => void;
+  events: Event[];
 }
 
-export const CalendarGrid = ({ currentDate, selectedDate, onDateSelect }: CalendarGridProps) => {
+export const CalendarGrid = ({ currentDate, selectedDate, onDateSelect, events }: CalendarGridProps) => {
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
   
@@ -30,6 +32,11 @@ export const CalendarGrid = ({ currentDate, selectedDate, onDateSelect }: Calend
            date.getFullYear() === selectedDate.getFullYear();
   };
 
+  const hasEvents = (date: Date) => {
+    const dateStr = date.toISOString().split("T")[0];
+    return events.some(event => event.date === dateStr);
+  };
+
   const days = [];
   
   for (let i = 0; i < startingDayOfWeek; i++) {
@@ -40,13 +47,14 @@ export const CalendarGrid = ({ currentDate, selectedDate, onDateSelect }: Calend
     const date = new Date(year, month, day);
     const isTodayDate = isToday(date);
     const isSelectedDate = isSelected(date);
+    const dateHasEvents = hasEvents(date);
     
     days.push(
       <button
         key={day}
         onClick={() => onDateSelect(date)}
         className={cn(
-          "aspect-square rounded-xl flex items-center justify-center text-sm font-medium transition-all hover:scale-105",
+          "aspect-square rounded-xl flex flex-col items-center justify-center text-sm font-medium transition-all hover:scale-105 relative",
           "hover:bg-primary hover:text-primary-foreground hover:shadow-soft",
           isTodayDate && "bg-gradient-warm text-primary-foreground shadow-warm font-bold",
           isSelectedDate && !isTodayDate && "bg-secondary text-secondary-foreground ring-2 ring-primary",
@@ -54,6 +62,9 @@ export const CalendarGrid = ({ currentDate, selectedDate, onDateSelect }: Calend
         )}
       >
         {day}
+        {dateHasEvents && (
+          <div className="absolute bottom-1 w-1 h-1 rounded-full bg-primary" />
+        )}
       </button>
     );
   }
