@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Calendar, CheckCircle2 } from "lucide-react";
@@ -11,6 +12,7 @@ interface GoogleCalendarConnectProps {
 }
 
 export const GoogleCalendarConnect = ({ isConnected, onConnectionChange }: GoogleCalendarConnectProps) => {
+  const navigate = useNavigate();
   const [isConnecting, setIsConnecting] = useState(false);
 
   const handleConnect = async () => {
@@ -20,10 +22,12 @@ export const GoogleCalendarConnect = ({ isConnected, onConnectionChange }: Googl
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
         toast({
-          title: "Authentication required",
-          description: "Please sign in to connect Google Calendar",
+          title: "Nceda ungene (Please sign in)",
+          description: "Kufuneka ungene ukuze uqhagamshele neGoogle Calendar (You need to sign in to connect Google Calendar)",
           variant: "destructive",
         });
+        setIsConnecting(false);
+        navigate("/auth");
         return;
       }
 

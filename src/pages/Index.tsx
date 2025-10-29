@@ -1,20 +1,26 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { User } from "@supabase/supabase-js";
 import { CalendarHeader } from "@/components/CalendarHeader";
 import { CalendarGrid } from "@/components/CalendarGrid";
 import { QuickNavigation } from "@/components/QuickNavigation";
 import { SelectedDateInfo } from "@/components/SelectedDateInfo";
 import { EventForm } from "@/components/EventForm";
 import { GoogleCalendarConnect } from "@/components/GoogleCalendarConnect";
+import { Button } from "@/components/ui/button";
 import { Event } from "@/types/event";
 import { xhosaTerms } from "@/utils/xhosaTranslations";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { LogOut, LogIn } from "lucide-react";
 
 const Index = () => {
+  const navigate = useNavigate();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
   const [events, setEvents] = useState<Event[]>([]);
   const [isGoogleConnected, setIsGoogleConnected] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
     const stored = localStorage.getItem("xhosa-calendar-events");
@@ -26,25 +32,49 @@ const Index = () => {
       }
     }
 
-    // Check if Google Calendar is connected
-    checkGoogleConnection();
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setUser(session?.user ?? null);
+        if (session?.user) {
+          checkGoogleConnection(session.user.id);
+        } else {
+          setIsGoogleConnected(false);
+        }
+      }
+    );
+
+    // Check initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        checkGoogleConnection(session.user.id);
+      }
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   useEffect(() => {
     localStorage.setItem("xhosa-calendar-events", JSON.stringify(events));
   }, [events]);
 
-  const checkGoogleConnection = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session) {
-      const { data } = await supabase
-        .from('google_calendar_tokens')
-        .select('id')
-        .eq('user_id', session.user.id)
-        .single();
-      
-      setIsGoogleConnected(!!data);
-    }
+  const checkGoogleConnection = async (userId: string) => {
+    const { data } = await supabase
+      .from('google_calendar_tokens')
+      .select('id')
+      .eq('user_id', userId)
+      .single();
+    
+    setIsGoogleConnected(!!data);
+  };
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    setIsGoogleConnected(false);
+    toast({
+      title: "Uphume (Signed out)",
+    });
   };
 
   const handlePreviousMonth = () => {
@@ -99,6 +129,19 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-earth">
       <div className="container max-w-5xl mx-auto px-4 py-8">
         <header className="text-center mb-12">
+          <div className="flex justify-end mb-4">
+            {user ? (
+              <Button onClick={handleSignOut} variant="outline" size="sm">
+                <LogOut className="h-4 w-4 mr-2" />
+                Phuma (Sign Out)
+              </Button>
+            ) : (
+              <Button onClick={() => navigate("/auth")} variant="outline" size="sm">
+                <LogIn className="h-4 w-4 mr-2" />
+                Ngena (Sign In)
+              </Button>
+            )}
+          </div>
           <h1 className="text-4xl md:text-5xl font-bold bg-gradient-warm bg-clip-text text-transparent mb-3">
             Ikhalenda YesiXhosa
           </h1>
