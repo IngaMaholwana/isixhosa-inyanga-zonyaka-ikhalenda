@@ -4,14 +4,17 @@ import { CalendarGrid } from "@/components/CalendarGrid";
 import { QuickNavigation } from "@/components/QuickNavigation";
 import { SelectedDateInfo } from "@/components/SelectedDateInfo";
 import { EventForm } from "@/components/EventForm";
+import { GoogleCalendarConnect } from "@/components/GoogleCalendarConnect";
 import { Event } from "@/types/event";
 import { xhosaTerms } from "@/utils/xhosaTranslations";
 import { toast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const Index = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
   const [events, setEvents] = useState<Event[]>([]);
+  const [isGoogleConnected, setIsGoogleConnected] = useState(false);
 
   useEffect(() => {
     const stored = localStorage.getItem("xhosa-calendar-events");
@@ -22,11 +25,27 @@ const Index = () => {
         console.error("Failed to load events", e);
       }
     }
+
+    // Check if Google Calendar is connected
+    checkGoogleConnection();
   }, []);
 
   useEffect(() => {
     localStorage.setItem("xhosa-calendar-events", JSON.stringify(events));
   }, [events]);
+
+  const checkGoogleConnection = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+      const { data } = await supabase
+        .from('google_calendar_tokens')
+        .select('id')
+        .eq('user_id', session.user.id)
+        .single();
+      
+      setIsGoogleConnected(!!data);
+    }
+  };
 
   const handlePreviousMonth = () => {
     setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1));
@@ -108,7 +127,16 @@ const Index = () => {
             onTomorrow={handleTomorrow}
           />
 
-          <EventForm selectedDate={selectedDate} onAddEvent={handleAddEvent} />
+          <GoogleCalendarConnect 
+            isConnected={isGoogleConnected}
+            onConnectionChange={setIsGoogleConnected}
+          />
+
+          <EventForm 
+            selectedDate={selectedDate} 
+            onAddEvent={handleAddEvent}
+            syncToGoogle={isGoogleConnected}
+          />
 
           <SelectedDateInfo 
             date={selectedDate} 
