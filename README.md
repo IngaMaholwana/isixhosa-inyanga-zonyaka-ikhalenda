@@ -1,18 +1,26 @@
-# Welcome to your Lovable project
+# Welcome to my project
 
-## Project info
+- Isizathu sokwe
 
-**URL**: https://lovable.dev/projects/c962e40b-9389-4cd7-948f-72a4486b72ab
+**Use GitHub Codespaces**
 
-## How can I edit this code?
+- Navigate to the main page of your repository.
+- Click on the "Code" button (green button) near the top right.
+- Select the "Codespaces" tab.
+- Click on "New codespace" to launch a new Codespace environment.
+- Edit files directly within the Codespace and commit and push your changes once you're done.
+
+## What technologies are used for this project?
+
+This project is built with:
+
+- Vite
+- TypeScript
+- React
+- shadcn-ui
+- Tailwind CSS
 
 There are several ways of editing your application.
-
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/c962e40b-9389-4cd7-948f-72a4486b72ab) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
 
 **Use your preferred IDE**
 
@@ -36,38 +44,104 @@ npm i
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+# Isixhosa Inyanga Zonyaka (Ikhalenda)
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+A small React + TypeScript calendar application with Xhosa translations and event management. The project provides a calendar grid, event creation form, event list, Google Calendar integration, and Supabase-backed persistence. The UI uses a component library organized under src/ui and follows a Vite+React+TypeScript setup.
 
-**Use GitHub Codespaces**
+## Key features
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+- Monthly calendar grid view
+- Create, edit and list events
+- Google Calendar connect (OAuth integration)
+- Supabase integration for storing events and user data
+- Xhosa translations / localization utilities
+- Reusable UI components under src/ui
 
-## What technologies are used for this project?
-
-This project is built with:
+## Tech stack
 
 - Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+- React + TypeScript
+- Supabase (client present in src/integrations/supabase)
+- ESLint + TypeScript config
+- shadcn-style UI primitives pattern (components in src/ui)
 
-## How can I deploy this project?
+## Getting started
 
-Simply open [Lovable](https://lovable.dev/projects/c962e40b-9389-4cd7-948f-72a4486b72ab) and click on Share -> Publish.
+Prerequisites
 
-## Can I connect a custom domain to my Lovable project?
+- Node.js 18+ (or compatible LTS)
+- npm or yarn
 
-Yes, you can!
+Install dependencies
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+npm install
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+Run development server
+
+npm run dev
+
+Build
+
+npm run build
+
+Preview production build
+
+npm run preview
+
+## Environment variables
+
+Create a .env or .env.local file at the project root with the values required by the integrations you use. Common variables expected by this project:
+
+- VITE_SUPABASE_URL - Your Supabase project URL
+- VITE_SUPABASE_ANON_KEY - Supabase anon public key
+- VITE_GOOGLE_CLIENT_ID - (Optional) Google OAuth client ID for Calendar integration
+- VITE_GOOGLE_API_KEY - (Optional) Google API key if used by any calendar APIs
+
+Ensure these variables are available to Vite (prefix with VITE_).
+
+## Project structure (src)
+
+- components/ - React components used by the app
+  - CalendarGrid.tsx - main calendar grid view
+  - CalendarHeader.tsx - header and navigation for calendar
+  - EventForm.tsx - form UI for creating/editing events
+  - EventList.tsx - list of events for selected date
+  - GoogleCalendarConnect.tsx - UI/logic to connect to Google Calendar
+  - QuickNavigation.tsx, SelectedDateInfo.tsx - helper components
+
+- components/ui/ - small UI primitives and wrappers (button, input, dialog, toast, etc.)
+
+- hooks/ - custom hooks (mobile detection, toast wrapper)
+
+- integrations/supabase/ - Supabase client and types
+
+- lib/ - shared utilities
+
+- pages/ - top-level route pages (Auth, Index, NotFound)
+
+- types/ - TypeScript types used across the app
+
+- utils/ - app-specific utils (e.g., Xhosa translations)
+
+## Notes on development
+
+- Linting: ESLint is configured to work with TypeScript in the repo (see eslint.config.js)
+- Calendar behavior and translations are driven by locale utilities in src/utils/xhosaTranslations.ts
+- Google Calendar integration requires proper OAuth credentials and redirect setup in the Google Cloud Console
+
+## Deployment
+
+Build with npm run build and deploy the generated `dist` folder to your static host. If you use server-side functions with Supabase, configure environment variables on your host and ensure CORS/redirect URIs match.
+
+## Contributing
+
+Contributions are welcome. Please open issues for bugs or feature requests and create pull requests for changes. Keep changes small and focused, and include clear commit messages.
+
+## License
+
+Add a LICENSE file to the project root if you intend to open-source this repository. If not specified, consider adding an OSI-approved license.
+
+## Contact
+
+For setup questions or issues, open an issue in the repository with reproduction steps and environment details.
+
