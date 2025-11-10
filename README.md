@@ -19,6 +19,9 @@ A small React + TypeScript calendar application with Xhosa translations and even
 
 - Vite
 - React + TypeScript
+- Google calender api
+- GOOGLE_CLIENT_ID - Google OAuth client ID for Calendar integration
+- VITE_GOOGLE_API_KEY - Google API key if used by any calendar APIs
 - Supabase (client present in src/integrations/supabase)
 - ESLint + TypeScript config
 - shadcn-style UI primitives pattern (components in src/ui)
