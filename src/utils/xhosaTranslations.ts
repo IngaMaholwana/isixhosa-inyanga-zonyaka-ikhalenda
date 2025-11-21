@@ -24,10 +24,10 @@ export const xhosaMonths = [
 ];
 
 export const xhosaSeasons = [
-  { english: "Autumn", xhosa: "eKwindla", months: [2, 3, 4] },
+  { english: "Autumn", xhosa: "eyoKwindla", months: [2, 3, 4] },
   { english: "Winter", xhosa: "uBusika", months: [5, 6, 7] },
   { english: "Spring", xhosa: "iNtlakohlaza", months: [8, 9, 10] },
-  { english: "Summer", xhosa: "iHlobo", months: [11, 0, 1] },
+  { english: "Summer", xhosa: "uHlobo", months: [11, 0, 1] },
 ];
 
 export const xhosaTerms = {
